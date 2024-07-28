@@ -86,8 +86,57 @@ export const useLlmControllerRunQuery = (
   })
 }
 
-export type QueryOperation = {
-  path: '/'
-  operationId: 'homeControllerAppInfo'
-  variables: HomeControllerAppInfoVariables
+export type LlmControllerStreamQueryError = Fetcher.ErrorWrapper<undefined>
+
+export type LlmControllerStreamQueryVariables = {
+  body: Schemas.RunQueryDto
+} & ApiContext['fetcherOptions']
+
+export const fetchLlmControllerStreamQuery = (
+  variables: LlmControllerStreamQueryVariables,
+  signal?: AbortSignal
+) =>
+  apiFetch<
+    undefined,
+    LlmControllerStreamQueryError,
+    Schemas.RunQueryDto,
+    {},
+    {},
+    {}
+  >({ url: '/api/llm/stream', method: 'get', ...variables, signal })
+
+export const useLlmControllerStreamQuery = <TData = undefined,>(
+  variables: LlmControllerStreamQueryVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<undefined, LlmControllerStreamQueryError, TData>,
+    'queryKey' | 'queryFn' | 'initialData'
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useApiContext(options)
+  return reactQuery.useQuery<undefined, LlmControllerStreamQueryError, TData>({
+    queryKey: queryKeyFn({
+      path: '/api/llm/stream',
+      operationId: 'llmControllerStreamQuery',
+      variables,
+    }),
+    queryFn: ({ signal }) =>
+      fetchLlmControllerStreamQuery(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    ...options,
+    ...queryOptions,
+  })
 }
+
+export type QueryOperation =
+  | {
+      path: '/'
+      operationId: 'homeControllerAppInfo'
+      variables: HomeControllerAppInfoVariables
+    }
+  | {
+      path: '/api/llm/stream'
+      operationId: 'llmControllerStreamQuery'
+      variables: LlmControllerStreamQueryVariables
+    }
