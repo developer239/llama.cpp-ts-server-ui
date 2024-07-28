@@ -38,3 +38,5 @@ yarn-error.log*
 # .tfstate files
 *.tfstate
 *.tfstate.*
+
+apps/**/models
