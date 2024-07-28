@@ -13,47 +13,48 @@ export class LlmService {
   ) {
     this.llama = new Llama()
     const initialized = this.llama.initialize(
-      `${__dirname}/../../../${this.appConfigValues.pathToModel}`
+      `${__dirname}/../../../${this.appConfigValues.pathToModel}`,
+        80000
     )
     if (!initialized) {
       throw new Error('Failed to initialize the LLM model')
     }
   }
 
-  runQuery(prompt: string, maxTokens = 100): string {
+  runQuery(prompt: string, maxTokens = 2000): string {
     return this.llama.runQuery(prompt, maxTokens)
   }
 
-  runQueryStream(prompt: string, maxTokens = 100): Observable<MessageEvent> {
-    const textToStream = `
-      This is a long static text that we will stream in chunks to simulate streaming behavior. 
-      We are adding more content here to ensure the text is sufficiently long for testing purposes. 
-      Streaming is a powerful way to send data to clients in real-time, allowing for a more interactive 
-      experience. This simulation will include artificial delays to mimic the process of data being 
-      processed and streamed in chunks over time. 
-      This is the last chunk of our sample text.
-    `;
+  runQueryStream(prompt: string, maxTokens = 2000): Observable<MessageEvent> {
+    return new Observable<MessageEvent>((observer) => {
+      const tokenStream: TokenStream = this.llama.runQueryStream(
+        prompt,
+        maxTokens
+      )
 
-    const textChunks = textToStream.match(/.{1,100}/g) || []; // Split the text into chunks of 100 characters
+      const readStream = async () => {
+        try {
+          while (true) {
+            const token: string | null = await tokenStream.read()
+            if (token === null) {
+              observer.complete()
+              break
+            }
 
-    return new Observable<MessageEvent>(observer => {
-      let index = 0;
+            observer.next({ data: token } as MessageEvent)
 
-      const sendNextChunk = async () => {
-        if (index < textChunks.length) {
-          observer.next({ data: textChunks[index] } as MessageEvent);
-          index++;
-          setTimeout(sendNextChunk, 500); // Artificial delay of 500ms between chunks
-        } else {
-          observer.complete();
+            await new Promise((resolve) => setImmediate(resolve))
+          }
+        } catch (error) {
+          observer.error(error)
         }
-      };
+      }
 
-      sendNextChunk(); // Start the streaming process
+      readStream()
 
       return () => {
-        console.log('Streaming stopped');
-      };
-    });
+        console.log('Streaming stopped')
+      }
+    })
   }
 }

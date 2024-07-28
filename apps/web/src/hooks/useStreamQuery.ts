@@ -27,7 +27,8 @@ export const useStreamQuery = () => {
     }
 
     eventSource.onerror = () => {
-      setError('An error occurred while streaming the response.')
+      // TODO: prevent false positive and implement proper error handling
+      // setError('An error occurred while streaming the response.')
       eventSource.close()
       setIsStreaming(false)
     }
@@ -37,7 +38,6 @@ export const useStreamQuery = () => {
       setIsStreaming(false)
     })
 
-    // Return a function to close the connection
     return () => {
       eventSource.close()
       setIsStreaming(false)

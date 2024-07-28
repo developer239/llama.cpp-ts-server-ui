@@ -8,10 +8,10 @@ import { useStreamQuery } from '../hooks/useStreamQuery'
 
 export const HomePage: FC = () => {
   const [prompt, setPrompt] = useState('')
-  const [maxTokens] = useState(100)
+  const [maxTokens] = useState(4000)
   const [previousPrompt, setPreviousPrompt] = useState<string>()
   const [hasEnteredSamePrompt, setHasEnteredSamePrompt] = useState(false)
-  const [useStreaming, setUseStreaming] = useState(false)
+  const [useStreaming, setUseStreaming] = useState(true)
   const [response, setResponse] = useState('')
 
   const runQuery = useLlmControllerRunQuery()
@@ -44,7 +44,7 @@ export const HomePage: FC = () => {
       return
     }
 
-    setResponse('') // Clear previous response
+    setResponse('')
 
     if (useStreaming) {
       streamQuery({ prompt, maxTokens })

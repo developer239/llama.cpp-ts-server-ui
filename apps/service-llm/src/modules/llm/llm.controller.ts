@@ -3,7 +3,6 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { Observable } from 'rxjs'
 import { QueryResponseDto } from './dto/query-response.dto'
 import { RunQueryDto } from './dto/run-query.dto'
-import { StreamQueryDto } from './dto/stream-query.dto'
 import { LlmService } from './llm.service'
 
 @Controller('llm')
