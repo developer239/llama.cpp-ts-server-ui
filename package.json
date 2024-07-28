@@ -1,0 +1,34 @@
+{
+  "name": "llama.cpp-ts-server-ui",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "format": "prettier --write '*/**/*.{ts,tsx,css,md,json}'",
+    "prepare:husky": "husky install",
+    "lint-staged": "lint-staged"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.3.0",
+    "@linters/commitlint-config": "1.8.0",
+    "@linters/eslint-config-node": "^1.13.1",
+    "@linters/eslint-config-react": "^1.15.1",
+    "@linters/eslint-config-typescript": "^1.20.1",
+    "@linters/eslint-config-vitest": "^0.2.0",
+    "@linters/prettier-config": "1.4.1",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "9.0.11",
+    "lint-staged": "15.2.5",
+    "prettier": "3.3.0",
+    "turbo": "1.13.3",
+    "typescript": "5.3.3"
+  },
+  "packageManager": "yarn@1.22.22"
+}
