@@ -9,8 +9,9 @@ interface PromptInputProps {
 export const PromptInput: FC<PromptInputProps> = ({ value, onChange }) => (
   <Textarea
     placeholder="Enter your prompt here..."
-    minRows={3}
     value={value}
     onChange={(event) => onChange(event.currentTarget.value)}
+    h={200}
+    styles={{ wrapper: { height: '100%' }, input: { height: '100%' } }}
   />
 )
