@@ -5,26 +5,33 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext tsx,ts src",
-    "preview": "vite preview"
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "codegen:init": "npx openapi-codegen init",
+    "codegen:run": "npx openapi-codegen gen api"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.6.0",
-    "clsx": "^2.1.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-hook-form": "^7.52.0",
-    "react-router-dom": "^6.24.0"
+    "@mantine/core": "7.3.2",
+    "@mantine/hooks": "7.3.2",
+    "@tanstack/react-query": "^5.15.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "6.21.0"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@types/react-router-dom": "^5.3.3",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.4",
-    "vite": "^5.3.1"
+    "@openapi-codegen/cli": "^2.0.0",
+    "@openapi-codegen/typescript": "^8.0.0",
+    "@types/react": "18.2.36",
+    "@types/react-dom": "18.2.14",
+    "@vitejs/plugin-react": "4.2.1",
+    "postcss": "8.4.32",
+    "postcss-preset-mantine": "1.12.0",
+    "postcss-simple-vars": "7.0.1",
+    "stylelint": "16.0.2",
+    "vite": "5.0.10",
+    "vite-tsconfig-paths": "4.2.2"
   }
 }
