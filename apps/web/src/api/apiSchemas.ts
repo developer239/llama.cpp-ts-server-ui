@@ -3,118 +3,24 @@
  *
  * @version 1.0
  */
-export enum WebSocketEventEvent {
-  requestAllGames = 'requestAllGames',
-  createGame = 'createGame',
-  joinGame = 'joinGame',
-  leaveGame = 'leaveGame',
-  requestStartGame = 'requestStartGame',
-  requestFlipCard = 'requestFlipCard',
-  allGames = 'allGames',
-  gameUpdated = 'gameUpdated',
-  exception = 'exception',
-}
-
-export type UsernameLoginRequestDTO = {
-  username: string
-}
-
-export type User = {
+export type RunQueryDto = {
   /**
-   * Unique user ID.
+   * The prompt to send to the LLM
    *
-   * @example 1
+   * @example Tell me a story about a brave knight.
    */
-  id: number
-  username: string
-}
-
-export type UsernameLoginResponseDTO = {
-  accessToken: string
-  user: User
-}
-
-export type MeDTO = {
+  prompt: string
   /**
-   * Unique user ID.
+   * Maximum number of tokens to generate
    *
-   * @example 1
+   * @example 100
    */
-  id?: number
-  username?: string
+  maxTokens?: number
 }
 
-export type CreateGameRequestDto = {
-  hostId: number
-}
-
-export type GridSize = {
-  width: number
-  height: number
-}
-
-export type Card = {
-  id: number
-  image: string
-}
-
-export type GamePlayer = {
-  user: User
-  turnStartedAt: string
-  turnCount: number
-  matchedCards: Card[]
-  cardsFlippedThisTurn: number
-}
-
-export type GameCard = {
-  id: number
-  card: Card
-  row: number
-  col: number
-  isMatched: boolean
-  matchedBy: User
-  isFlipped: boolean
-}
-
-export type Game = {
-  id: number
-  host: User
-  gridSize: GridSize
-  maxPlayers: number
-  timeLimitSeconds: number
-  turnLimitSeconds: number
-  cardVisibleTimeSeconds: number
-  startedAt: string
-  finishedAt: string
-  players: GamePlayer[]
-  cards: GameCard[]
-}
-
-export type JoinGameRequestDto = {
-  userId: number
-  gameId: number
-}
-
-export type LeaveGameRequestDto = {
-  userId: number
-  gameId: number
-}
-
-export type ExceptionResponseDto = {
-  message: string
-}
-
-export type StartGameRequestDto = {
-  userId: number
-  gameId: number
-}
-
-export type WebSocketEvent = {
-  event: WebSocketEventEvent
-}
-
-export type RequestFlipCardDto = {
-  gameId: number
-  userId: number
-  cardId: number
+export type QueryResponseDto = {
+  /**
+   * The response from the LLM
+   */
+  response: string
 }

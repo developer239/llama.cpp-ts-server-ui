@@ -6,9 +6,7 @@ export type ApiContext = {
     /**
      * Headers to inject in the fetcher
      */
-    headers?: {
-      authorization?: string
-    }
+    headers?: {}
     /**
      * Query params to inject in the fetcher
      */
@@ -43,17 +41,9 @@ export function useApiContext<
     'queryKey' | 'queryFn'
   >
 ): ApiContext {
-  const token = localStorage.getItem('accessToken')
-
   return {
-    fetcherOptions: {
-      headers: {
-        authorization: token ? `Bearer ${token}` : undefined,
-      }
-    },
-    queryOptions: {
-      enabled: token !== null && (_queryOptions?.enabled ?? true),
-    },
+    fetcherOptions: {},
+    queryOptions: {},
     queryKeyFn,
   }
 }

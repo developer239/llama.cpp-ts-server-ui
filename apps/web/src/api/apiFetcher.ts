@@ -1,10 +1,11 @@
+import { config } from "src/config.ts";
 import { ApiContext } from './apiContext'
 
-const baseUrl = import.meta.env.VITE_API_URL
+const baseUrl = config.uri
 
 export type ErrorWrapper<TError> =
   | TError
-  | { status: 'unknown'; payload: string; message?: string }
+  | { status: 'unknown'; payload: string }
 
 export type ApiFetcherOptions<TBody, THeaders, TQueryParams, TPathParams> = {
   url: string
@@ -22,7 +23,7 @@ export async function apiFetch<
   TBody extends {} | FormData | undefined | null,
   THeaders extends {},
   TQueryParams extends {},
-  TPathParams extends {}
+  TPathParams extends {},
 >({
   url,
   method,
@@ -89,14 +90,15 @@ export async function apiFetch<
 
     if (response.headers.get('content-type')?.includes('json')) {
       return await response.json()
-    } else {
+    } 
       // if it is not a json response, assume it is a blob and cast it to TData
       return (await response.blob()) as unknown as TData
-    }
-  } catch (e: any) {
-    let errorObject: Error = {
+    
+  } catch (e) {
+    const errorObject: Error = {
       name: 'unknown' as const,
-      message: e.message || 'Unknown error',
+      message:
+        e instanceof Error ? `Network error (${e.message})` : 'Network error',
       stack: e as string,
     }
     throw errorObject

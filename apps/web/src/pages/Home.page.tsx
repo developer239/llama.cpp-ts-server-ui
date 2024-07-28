@@ -1,53 +1,61 @@
 import { Grid, Stack, Text } from '@mantine/core'
 import { FC, useState } from 'react'
+import { useLlmControllerRunQuery } from '../api/apiComponents'
 import { PromptInput } from '../components/PromptInput'
 import { ResponseDisplay } from '../components/ResponseDisplay'
 import { SubmitButton } from '../components/SubmitButton'
 
 export const HomePage: FC = () => {
   const [prompt, setPrompt] = useState('')
-  const [response, setResponse] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [maxTokens] = useState(100)
+  const [previousPrompt, setPreviousPrompt] = useState<string>()
+  const [hasEnteredSamePrompt, setHasEnteredSamePrompt] = useState(false)
+
+  const runQuery = useLlmControllerRunQuery()
 
   const handleSubmit = () => {
-    // Input validation
-    if (prompt.trim().length === 0) {
-      setError('Please enter a prompt before submitting.')
+    if (previousPrompt === prompt) {
+      setHasEnteredSamePrompt(true)
       return
     }
 
-    setError('')
-    setLoading(true)
+    if (prompt.trim().length === 0) {
+      return
+    }
 
-    // Simulating API call with potential for error
-    setTimeout(() => {
-      const success = Math.random() > 0.2 // 80% success rate for demonstration
-
-      if (success) {
-        setResponse(`This is a mock response to: "${prompt}"`)
-        setLoading(false)
-      } else {
-        setError(
-          'An error occurred while fetching the response. Please try again.'
-        )
-        setLoading(false)
-      }
-    }, 1000)
+    runQuery.mutate({ body: { prompt, maxTokens } })
+    setPreviousPrompt(prompt)
   }
 
   return (
     <Grid>
       <Grid.Col>
         <Stack>
-          <PromptInput value={prompt} onChange={setPrompt} />
+          <PromptInput
+            value={prompt}
+            onChange={(value) => {
+              setHasEnteredSamePrompt(false)
+              setPrompt(value)
+            }}
+          />
           <SubmitButton
             onClick={handleSubmit}
-            loading={loading}
-            disabled={prompt.trim().length === 0}
+            loading={runQuery.isPending}
+            disabled={
+              prompt.trim().length === 0 ||
+              runQuery.isPending ||
+              hasEnteredSamePrompt
+            }
           />
-          {error && <Text c="red">{error}</Text>}
-          {response && <ResponseDisplay response={response} />}
+          {hasEnteredSamePrompt && (
+            <Text c="red">Please enter a different prompt.</Text>
+          )}
+          {runQuery.isError && (
+            <Text c="red">An error occurred. Please try again.</Text>
+          )}
+          {runQuery.data && (
+            <ResponseDisplay response={runQuery.data.response} />
+          )}
         </Stack>
       </Grid.Col>
     </Grid>
