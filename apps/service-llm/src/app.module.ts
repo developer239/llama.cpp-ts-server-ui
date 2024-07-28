@@ -9,6 +9,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import * as Joi from 'joi'
 import { appConfig, appConfigSchema } from 'src/config/app.config'
 import { HomeModule } from 'src/modules/home/home.module'
+import { LlmModule } from 'src/modules/llm/llm.module'
 import { validationOptions } from 'src/utils/validation-options'
 
 @Module({
@@ -28,6 +29,7 @@ import { validationOptions } from 'src/utils/validation-options'
       }),
     }),
     HomeModule,
+    LlmModule,
   ],
   providers: [
     {
