@@ -25,29 +25,35 @@ export class LlmService {
   }
 
   runQueryStream(prompt: string, maxTokens = 100): Observable<MessageEvent> {
-    return new Observable<MessageEvent>((observer) => {
-      const tokenStream: TokenStream = this.llama.runQueryStream(
-        prompt,
-        maxTokens
-      )
+    const textToStream = `
+      This is a long static text that we will stream in chunks to simulate streaming behavior. 
+      We are adding more content here to ensure the text is sufficiently long for testing purposes. 
+      Streaming is a powerful way to send data to clients in real-time, allowing for a more interactive 
+      experience. This simulation will include artificial delays to mimic the process of data being 
+      processed and streamed in chunks over time. 
+      This is the last chunk of our sample text.
+    `;
 
-      const readStream = async () => {
-        while (true) {
-          const token = await tokenStream.read()
-          if (token === null) {
-            observer.complete()
-            break
-          }
-          console.log(token)
-          observer.next({ data: token } as MessageEvent)
+    const textChunks = textToStream.match(/.{1,100}/g) || []; // Split the text into chunks of 100 characters
+
+    return new Observable<MessageEvent>(observer => {
+      let index = 0;
+
+      const sendNextChunk = async () => {
+        if (index < textChunks.length) {
+          observer.next({ data: textChunks[index] } as MessageEvent);
+          index++;
+          setTimeout(sendNextChunk, 500); // Artificial delay of 500ms between chunks
+        } else {
+          observer.complete();
         }
-      }
+      };
 
-      readStream().catch((error) => observer.error(error))
+      sendNextChunk(); // Start the streaming process
 
       return () => {
-        // TODO: make the stream cancelable
-      }
-    })
+        console.log('Streaming stopped');
+      };
+    });
   }
 }
