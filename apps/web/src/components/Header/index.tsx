@@ -14,7 +14,7 @@ export const Header = () => {
   return (
     <header className={classes.header}>
       <Group justify="space-between" h="100%">
-        Llama.cpp
+        <span className={classes['header-text']}>Llama.cpp UI</span>
         <Group justify="center">
           <Switch
             checked={isDark}
