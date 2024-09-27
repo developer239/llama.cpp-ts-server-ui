@@ -1,18 +1,29 @@
-import { Grid, Stack, Text, Switch } from '@mantine/core'
+/* eslint-disable */
+import { Grid, Stack, Text, Switch, Button } from '@mantine/core'
 import { FC, useState, useEffect } from 'react'
-import { useLlmControllerRunQuery } from '../api/apiComponents'
+import {
+  useLlmControllerResetConversation,
+  useLlmControllerRunQuery,
+} from '../api/apiComponents'
 import { PromptInput } from '../components/PromptInput'
 import { ResponseDisplay } from '../components/ResponseDisplay'
 import { SubmitButton } from '../components/SubmitButton'
 import { useStreamQuery } from '../hooks/useStreamQuery'
 
+interface Message {
+  role: 'user' | 'assistant'
+  content: string
+}
+
 export const HomePage: FC = () => {
   const [prompt, setPrompt] = useState('')
   const [maxTokens] = useState(4000)
-  const [previousPrompt, setPreviousPrompt] = useState<string>()
-  const [hasEnteredSamePrompt, setHasEnteredSamePrompt] = useState(false)
   const [useStreaming, setUseStreaming] = useState(true)
   const [response, setResponse] = useState('')
+  const [conversationHistory, setConversationHistory] = useState<Message[]>([])
+
+  const [isResettingConversation, setIsResettingConversation] = useState(false)
+  const { mutate: resetConversation } = useLlmControllerResetConversation()
 
   const runQuery = useLlmControllerRunQuery()
   const {
@@ -23,10 +34,6 @@ export const HomePage: FC = () => {
   } = useStreamQuery()
 
   useEffect(() => {
-    setHasEnteredSamePrompt(false)
-  }, [prompt])
-
-  useEffect(() => {
     if (useStreaming) {
       setResponse(streamedResponse)
     } else if (runQuery.data) {
@@ -35,36 +42,60 @@ export const HomePage: FC = () => {
   }, [useStreaming, streamedResponse, runQuery.data])
 
   const handleSubmit = () => {
-    if (previousPrompt === prompt) {
-      setHasEnteredSamePrompt(true)
-      return
-    }
-
     if (prompt.trim().length === 0) {
       return
     }
 
     setResponse('')
+    setConversationHistory((prev) => [
+      ...prev,
+      { role: 'user', content: prompt },
+    ])
 
     if (useStreaming) {
       streamQuery({ prompt, maxTokens })
     } else {
       runQuery.mutate({ body: { prompt, maxTokens } })
     }
-    setPreviousPrompt(prompt)
+  }
+
+  useEffect(() => {
+    if (response && !isStreaming && !runQuery.isPending) {
+      setConversationHistory((prev) => [
+        ...prev,
+        { role: 'assistant', content: response },
+      ])
+      setPrompt('')
+    }
+  }, [response, isStreaming, runQuery.isPending])
+
+  const handleResetConversation = async () => {
+    setConversationHistory([])
+    setPrompt('')
+    setResponse('')
+
+    setIsResettingConversation(true)
+    await resetConversation({})
+    setIsResettingConversation(false)
   }
 
   return (
     <Grid>
       <Grid.Col>
+        <Stack mb={20}>
+          {conversationHistory.map((message, index) => (
+              <ResponseDisplay
+                  key={index}
+                  response={message.content}
+                  role={message.role}
+              />
+          ))}
+        </Stack>
         <Stack>
-          <PromptInput
-            value={prompt}
-            onChange={(value) => {
-              setHasEnteredSamePrompt(false)
-              setPrompt(value)
-            }}
-          />
+          <Button onClick={handleResetConversation}>
+            {isResettingConversation ? '...' : 'Reset Conversation'}
+          </Button>
+          <PromptInput value={prompt} onChange={(value) => setPrompt(value)} />
           <Switch
             label="Use streaming"
             checked={useStreaming}
@@ -74,21 +105,17 @@ export const HomePage: FC = () => {
             onClick={handleSubmit}
             loading={runQuery.isPending || isStreaming}
             disabled={
-              prompt.trim().length === 0 ||
-              runQuery.isPending ||
-              isStreaming ||
-              hasEnteredSamePrompt
+              prompt.trim().length === 0 || runQuery.isPending || isStreaming
             }
           />
-          {hasEnteredSamePrompt && (
-            <Text c="red">Please enter a different prompt.</Text>
-          )}
           {(runQuery.isError || streamError) && (
             <Text c="red">
               {streamError || 'An error occurred. Please try again.'}
             </Text>
           )}
-          <ResponseDisplay response={response} />
+          {isStreaming && (
+            <ResponseDisplay response={response} role="assistant" />
+          )}
         </Stack>
       </Grid.Col>
     </Grid>

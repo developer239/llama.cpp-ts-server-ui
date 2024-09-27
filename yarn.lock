@@ -5833,10 +5833,10 @@ listr2@~8.2.1:
     rfdc "^1.4.1"
     wrap-ansi "^9.0.0"
 
-llama.cpp-ts@^1.0.10:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/llama.cpp-ts/-/llama.cpp-ts-1.0.10.tgz#fba23c676dd2b2b8c511d1afa3b728b32c503b29"
-  integrity sha512-1TnFUB4RPcm7nqyb6OBs84jQc3GKYbudl++xMDrQ8gXWHX75i5FBkvVFLcgXxiYM8oxD4DRcYzgjZzPgmaYZSw==
+llama.cpp-ts@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/llama.cpp-ts/-/llama.cpp-ts-1.2.0.tgz#926bb41049c32e34660297b84e154eda46b2ea67"
+  integrity sha512-hqSd+BS3YL+gIXrPvzZmFmdy8qs4uJ1Z78icG0c2soXuA4F2/LT41AmjVs2WwWLu7EgtHvmrHZ9lwvgzN+LWsQ==
   dependencies:
     cmake-js "7.3.0"
     node-addon-api "8.1.0"

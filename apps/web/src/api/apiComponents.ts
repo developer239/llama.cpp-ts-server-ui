@@ -86,10 +86,56 @@ export const useLlmControllerRunQuery = (
   })
 }
 
+export type LlmControllerResetConversationError =
+  Fetcher.ErrorWrapper<undefined>
+
+export type LlmControllerResetConversationVariables =
+  ApiContext['fetcherOptions']
+
+export const fetchLlmControllerResetConversation = (
+  variables: LlmControllerResetConversationVariables,
+  signal?: AbortSignal
+) =>
+  apiFetch<
+    undefined,
+    LlmControllerResetConversationError,
+    undefined,
+    {},
+    {},
+    {}
+  >({ url: '/api/llm/reset', method: 'post', ...variables, signal })
+
+export const useLlmControllerResetConversation = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      undefined,
+      LlmControllerResetConversationError,
+      LlmControllerResetConversationVariables
+    >,
+    'mutationFn'
+  >
+) => {
+  const { fetcherOptions } = useApiContext()
+  return reactQuery.useMutation<
+    undefined,
+    LlmControllerResetConversationError,
+    LlmControllerResetConversationVariables
+  >({
+    mutationFn: (variables: LlmControllerResetConversationVariables) =>
+      fetchLlmControllerResetConversation({ ...fetcherOptions, ...variables }),
+    ...options,
+  })
+}
+
+export type LlmControllerStreamQueryQueryParams = {
+  prompt: string
+  maxTokens: number
+}
+
 export type LlmControllerStreamQueryError = Fetcher.ErrorWrapper<undefined>
 
 export type LlmControllerStreamQueryVariables = {
-  body: Schemas.RunQueryDto
+  queryParams: LlmControllerStreamQueryQueryParams
 } & ApiContext['fetcherOptions']
 
 export const fetchLlmControllerStreamQuery = (
@@ -99,9 +145,9 @@ export const fetchLlmControllerStreamQuery = (
   apiFetch<
     undefined,
     LlmControllerStreamQueryError,
-    Schemas.RunQueryDto,
+    undefined,
     {},
-    {},
+    LlmControllerStreamQueryQueryParams,
     {}
   >({ url: '/api/llm/stream', method: 'get', ...variables, signal })
 
